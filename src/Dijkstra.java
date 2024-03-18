@@ -5,7 +5,7 @@ public class Dijkstra {
 
     public static int[] findShortestPaths(Graph graph, int source) {
         int numVertices = graph.getNumVertices();
-        int[] distances = new int[numVertices]; // Stores distances from source
+        int[] distances = new int[numVertices];
         boolean[] visited = new boolean[numVertices]; // Track visited nodes
         LinkedList<Edge>[] adjListCopy = graph.getAdjListCopy();
 
@@ -13,7 +13,7 @@ public class Dijkstra {
         Arrays.fill(distances, Integer.MAX_VALUE);
         distances[source] = 0; // Distance to source is 0
 
-        for (int count = 0; count < numVertices - 1; count++) { // Potentially early termination
+        for (int count = 0; count < numVertices - 1; count++) {
             int minDistanceNode = findMinDistanceNode(distances, visited);
             visited[minDistanceNode] = true;
 
@@ -24,7 +24,6 @@ public class Dijkstra {
                 }
             }
 
-            // Early termination if all vertices are visited
             if (isAllVisited(visited)) {
                 break;
             }
@@ -49,9 +48,20 @@ public class Dijkstra {
     private static boolean isAllVisited(boolean[] visited) {
         for (boolean visitedState : visited) {
             if (!visitedState) {
-                return false; // Not all vertices are visited
+                return false;
             }
         }
         return true; // All vertices are visited
     }
 }
+
+
+
+
+
+
+
+
+
+
+

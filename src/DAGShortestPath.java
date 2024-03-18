@@ -1,80 +1,81 @@
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
 
 public class DAGShortestPath {
 
-    public static int[] findShortestPaths(Graph graph, int source) {
+    public int[] findShortestPaths(Graph graph, int source) {
         int numVertices = graph.getNumVertices();
-        int[] distances = new int[numVertices];  // Stores distances from source
-        LinkedList<Edge>[] adjListCopy = graph.getAdjListCopy();
 
+        LinkedList<Integer> topologicalOrder = topologicalSort(graph);
+
+        int[] distances = new int[numVertices];
         Arrays.fill(distances, Integer.MAX_VALUE);
-        distances[source] = 0; // Distance to source is 0
+        distances[source] = 0; // Distance from source to itself is 0
 
-        // Perform Topological Sort (using Kahn's Algorithm)
-        List<Integer> topologicalOrder = topologicalSort(graph);
+        // Process vertices in topological order
+        for (int u : topologicalOrder) {
+            for (Edge neighbor : graph.getNeighbors(u)) {
+                int v = neighbor.getDestination();
+                int weight = neighbor.getWeight();
 
-        // BFS traversal based on topological order
-        Queue<Integer> queue = new LinkedList<>();
-        queue.add(source);
-
-        while (!queue.isEmpty()) {
-            int current = queue.poll();
-            for (Edge neighbor : adjListCopy[current]) {
-                int neighborVertex = neighbor.getDestination();
-                distances[neighborVertex] = Math.min(distances[neighborVertex], distances[current] + neighbor.getWeight());
-                queue.add(neighborVertex);
+                // Relaxation condition
+                distances[v] = Math.min(distances[v], distances[u] + weight);
             }
         }
 
         return distances;
     }
 
-    // Implementation of Topological Sort using Kahn's Algorithm
-    private static List<Integer> topologicalSort(Graph graph) {
+    // Helper method for Topological Sort using BFS
+    private static LinkedList<Integer> topologicalSort(Graph graph) {
         int numVertices = graph.getNumVertices();
-        int[] inDegrees = new int[numVertices];  // Count in-degree for each vertex
 
-        // Calculate in-degree for each vertex
+
+        LinkedList<Integer> queue = new LinkedList<>();
+
+
+        int[] inDegrees = new int[numVertices];
         for (int i = 0; i < numVertices; i++) {
             for (Edge neighbor : graph.getNeighbors(i)) {
                 inDegrees[neighbor.getDestination()]++;
             }
         }
 
-        // Create a queue to store vertices with in-degree 0
-        Queue<Integer> queue = new LinkedList<>();
         for (int i = 0; i < numVertices; i++) {
             if (inDegrees[i] == 0) {
                 queue.add(i);
             }
         }
 
-        List<Integer> topologicalOrder = new LinkedList<>();
-        int processedVertices = 0;
-
-        // Process vertices using BFS based on in-degree
+        LinkedList<Integer> topologicalOrder = new LinkedList<>();
         while (!queue.isEmpty()) {
-            int current = queue.poll();
-            processedVertices++;
-            topologicalOrder.add(current);
+            int u = queue.poll();
+            topologicalOrder.add(u);
 
-            for (Edge neighbor : graph.getNeighbors(current)) {
-                int neighborVertex = neighbor.getDestination();
-                inDegrees[neighborVertex]--;
-                if (inDegrees[neighborVertex] == 0) {
-                    queue.add(neighborVertex);
+            for (Edge neighbor : graph.getNeighbors(u)) {
+                int v = neighbor.getDestination();
+                inDegrees[v]--;
+
+                if (inDegrees[v] == 0) {
+                    queue.add(v);
                 }
             }
         }
 
-        // Check for cycles (not a DAG)
-        if (processedVertices != numVertices) {
-            throw new RuntimeException("Graph is not a DAG (cycle detected)");
+        if (topologicalOrder.size() != numVertices) {
+            System.out.println("Error: Graph is not a valid DAG (cycle detected during Topological Sort).");
+            return null;  // Indicate failure
         }
 
         return topologicalOrder;
     }
 }
+
+
+
+
+
+
+
+
+

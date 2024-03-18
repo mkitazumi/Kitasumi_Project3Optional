@@ -1,48 +1,45 @@
 import java.util.Arrays;
-import java.util.LinkedList;
 
 public class BellmanFord {
 
-    public static boolean findShortestPaths(Graph graph, int source) {
+    public int[] findShortestPaths(Graph graph, int source) {
         int numVertices = graph.getNumVertices();
+
+        // Initialize distances to infinity (except source)
         int[] distances = new int[numVertices];
-
-        // Get a deep copy of adjList ONLY ONCE
-        LinkedList<Edge>[] adjListCopy = graph.getAdjListCopy();
-
         Arrays.fill(distances, Integer.MAX_VALUE);
-        distances[source] = 0;
+        distances[source] = 0; // Distance from source to itself is 0
 
-        // Relaxation process (V-1 iterations)
+        // Relax edges repeatedly (numVertices - 1 iterations) to handle negative cycles
         for (int i = 0; i < numVertices - 1; i++) {
-            boolean didUpdate = false;
             for (int u = 0; u < numVertices; u++) {
-                for (Edge neighbor : adjListCopy[u]) {
-                    int v = neighbor.getDestination(); // Get destination vertex from Edge object
-                    int weight = neighbor.getWeight(); // Get weight from Edge object
-                    int newDistance = distances[u] + weight;
-                    if (distances[v] > newDistance) {
-                        distances[v] = newDistance;
-                        didUpdate = true;
+                for (Edge neighbor : graph.getNeighbors(u)) {
+                    int v = neighbor.getDestination();
+                    int weight = neighbor.getWeight();
+
+                    // Relaxation condition
+                    if (distances[u] + weight < distances[v]) {
+                        distances[v] = distances[u] + weight;
                     }
                 }
             }
-            if (!didUpdate) {
-                break;  // Optimization: No updates, no negative cycle
-            }
         }
 
-        // Check for negative cycle (relax one more time)
+        // Check for negative weight cycles (optional)
         for (int u = 0; u < numVertices; u++) {
-            for (Edge neighbor : adjListCopy[u]) {
-                int v = neighbor.getDestination(); // Get destination vertex from Edge object
-                int weight = neighbor.getWeight(); // Get weight from Edge object
-                if (distances[v] > distances[u] + weight) {
-                    return true;  // Negative cycle detected
+            for (Edge neighbor : graph.getNeighbors(u)) {
+                int v = neighbor.getDestination();
+                int weight = neighbor.getWeight();
+                if (distances[u] + weight < distances[v]) {
+                    // Negative cycle detected (return null to indicate failure)
+                    return null;
                 }
             }
         }
 
-        return false;  // No negative cycle found
+        return distances;
     }
 }
+
+
+

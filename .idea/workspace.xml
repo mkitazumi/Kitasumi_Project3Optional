@@ -24,6 +24,9 @@
     <analyzeAfterCompile>true</analyzeAfterCompile>
     <toolWindowToFront>false</toolWindowToFront>
   </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
+  </component>
   <component name="ProjectId" id="2dpGMUhqWXmI3jVUNwINiOvIBKX" />
   <component name="ProjectViewState">
     <option name="abbreviatePackageNames" value="true" />
